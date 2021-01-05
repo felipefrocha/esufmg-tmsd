@@ -1,9 +1,10 @@
+import math
 import random
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
-import math
+
 mpl.rcParams['legend.fontsize'] = 10
 
 
@@ -17,17 +18,16 @@ def dvCord(x, ux, uy, t):
     # G = 1
     epsilon = 8.53
 
-
     xd = np.array(np.zeros((3, 1)))
 
     xd[0] = x[1]
-    xd[1] = -x[0] + epsilon * x[1] + ux - epsilon * x[0]**2 * x[1]
+    xd[1] = -x[0] + epsilon * x[1] + ux - epsilon * x[0] ** 2 * x[1]
     # xd[2] = x[0]
 
     return (xd.copy())
 
 
-def rkCord(x0, ux, uy, h, t):
+def rk_cord(x0, ux, uy, h, t):
     # 1st evaluation
     xd = dvCord(x0, ux, uy, t)
     savex0 = x0.copy()
@@ -70,13 +70,19 @@ if __name__ == "__main__":
     x = x0.copy()
     x = np.append(x, z_x, axis=1)
     print(x)
-    Ts = 1/100
+    Ts = 1 / 100
     omega = (2 * math.pi) / 10
     U = 1.2
-    u = np.array([U * math.sin(omega * i * Ts) for i in t])  #np.zeros((len(t), 1))
-    
+    # Degrau
+    u = np.append(np.zeros((math.floor(len(t)/2), 1)), np.full((math.floor(len(t)/2)+1, 1), 1))
+
+    # Pulso
+    # u = np.array([U * math.sin(omega * i * Ts) for i in t])  # np.zeros((len(t), 1))
+    # Senoidal
+    # u = np.array([U * math.sin(omega * i * Ts) for i in t])  # np.zeros((len(t), 1))
+
     for k in range(1, len(t)):
-        result = rkCord(x[:, k - 1].copy(), u[k], u[k], h, t[k])
+        result = rk_cord(x[:, k - 1].copy(), u[k], u[k], h, t[k])
         x[:, k] = result
 
     fig, ax = plt.subplots(constrained_layout=True, figsize=(8, 4))
